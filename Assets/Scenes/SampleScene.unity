@@ -1173,6 +1173,10 @@ PrefabInstance:
       propertyPath: maxSpawnedBeeAtOnce
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
+      propertyPath: loadNeuralsFromSaved
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7212230581911455649, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
       propertyPath: m_IsTrigger
       value: 1

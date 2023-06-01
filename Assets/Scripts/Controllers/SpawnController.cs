@@ -8,7 +8,9 @@ using System.Runtime.InteropServices;
 
 public class SpawnController : MonoBehaviour
 {
-
+    private static int _id = 0;
+    public static int maxSpawner = 2;
+    public int Id;
     private Vector3 position;
     private float radius = 2f;
 
@@ -68,10 +70,12 @@ public class SpawnController : MonoBehaviour
     // Update is called once per frame
     private void Start()
     {
+        Id = _id++;
         allNeatBee  = new List<GameObject>();
+
         drawer = GameObject.FindObjectOfType<DrawNeuralNetwork>(); //this ensures everyone has the
         //same drawer object.
-
+        
         //queensNetwork = new NeatNetwork(inputNodes, outputNodes, hiddenNodes);
         if (queensNetwork == null)
         {
@@ -142,12 +146,17 @@ public class SpawnController : MonoBehaviour
         //best is off because too much processing power needed -->> ##Devnote:
         //Also it should get the best of all population. Or atleast it should show the best per hive.
 
-        //var tmpBest = GetBest();
-        //if (drawer.neuralNetwork != tmpBest)
-        //{
-        //    drawer.neuralNetwork = tmpBest;
-        //    drawer.Plot();
-        //}
+        
+        if (Id == 0)
+        {
+            var tmpBest = GetBest();
+            if (drawer.neuralNetwork != tmpBest)
+            {
+                drawer.neuralNetwork = tmpBest;
+                drawer.Plot();
+            }
+        }
+
 
         currentBeeCounter = GetCurrentCount();
 
@@ -226,7 +235,7 @@ public class SpawnController : MonoBehaviour
     private void SpawnABee(NeatNetwork printableNet)
     {
         //by a little chance the spawner will create a queen which is able to evolve to a spawner.
-        if (UnityEngine.Random.Range(0.0f,1.0f)<queenSpawnChance)
+        if (UnityEngine.Random.Range(0.0f,1.0f)<queenSpawnChance && GameObject.FindObjectsOfType<SpawnController>().Length<maxSpawner)
         {
             Vector3 pos = GetPositionOutsideCircle(new Vector3(0, 0, 0), radius); //this makes the spawning a little less deterministic
 
