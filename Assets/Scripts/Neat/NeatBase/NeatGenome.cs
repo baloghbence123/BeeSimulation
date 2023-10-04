@@ -10,15 +10,18 @@ public class NeatGenome
     public List<ConGene> conGenes;
     public static List<ConGene> innovConGene = new List<ConGene>();
     //Creating chances
-    float createEdgeChance = 5f;
+    float createEdgeChance = 6f;
     float createNodeChance = 2f;
 
+    float deleteEdgeChance = 1f;
+    
+
     //Weight mutation chances
-    float randomWeightChance = 5f;
+    float randomWeightChance = 1f;
     float perturbWeightChance = 90f;
 
     //Weight mutation mutation multiplayer range => if multiplier is 1 then the range between -0.5 and 0.5 
-    float perturbWeightMultiplier = 0.25f;
+    float perturbWeightMultiplier = 0.1f;
 
     public NeatGenome()
     {
@@ -37,6 +40,14 @@ public class NeatGenome
 
         float chanceEdge = UnityEngine.Random.Range(0f, 100f);
         float chanceNode = UnityEngine.Random.Range(0f, 100f);
+        float deleteConChance = UnityEngine.Random.Range(0f, 100f);
+
+
+        if (deleteConChance <= deleteEdgeChance)
+        {
+            // Delete a random connection
+            DeleteRandomConnection();
+        }
 
         if (chanceNode <= createNodeChance)
         {
@@ -48,6 +59,7 @@ public class NeatGenome
             // Create Random New Edge
             AddRandomConnection();
         }
+
         // Mutate The Weights
         MutateWeights();
     }
@@ -74,6 +86,7 @@ public class NeatGenome
             nodeGenes.Add(newNode);
 
             //int nextInovNum = GetNextInovNum();
+
             int nextInovNum = GettingInovNumber(firstNode,newNode.id);
             if (nextInovNum == -1) //no connection like that
             {
@@ -121,6 +134,13 @@ public class NeatGenome
         }
         nextID = nextID + 1;
         return nextID;
+    }
+    private bool DeleteRandomConnection()
+    {
+        int connectionNumber = UnityEngine.Random.Range(0, conGenes.Count);
+        conGenes.Remove(conGenes[connectionNumber]);
+
+        return true;
     }
     private bool AddRandomConnection()
     {
@@ -220,7 +240,7 @@ public class NeatGenome
         {
             int randomConIndex = UnityEngine.Random.Range(0, conGenes.Count);
             ConGene connection = conGenes[randomConIndex];
-            connection.weight = UnityEngine.Random.Range(-1f, 1f);
+            connection.weight = UnityEngine.Random.Range(-0.5f, 0.5f);
         }
     }
 

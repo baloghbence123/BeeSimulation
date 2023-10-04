@@ -12,8 +12,8 @@ public class BeeController : MonoBehaviour
 
     private float[] sensors;
 
-    private float hitDivider = 25f;
-    private float rayDistance = 25f;
+    private float hitDivider = 7f;
+    private float rayDistance = 7f;
 
 
     
@@ -103,26 +103,25 @@ public class BeeController : MonoBehaviour
     {
         if (collision.transform.tag == "Food")
         {
-            if (foodCapacity > foodCounter)
-            {
+
                 collision.gameObject.GetComponent<FoodController>().SpawnSignleFood();
                 Destroy(collision.gameObject);
                 foodCounter++;
                 currentEnergy += foodMultiplier;
+                mySpawner.foodCounter += this.foodCounter;
                 //Debug.Log("Bee Ate Food");
-            }
         }
-        else if (collision.transform.tag == "Hive")
-        {
-            if (foodCounter > 0)
-            {
-                collision.gameObject.GetComponent<SpawnController>().foodCounter += this.foodCounter;
-                this.depositCounter += this.foodCounter;
-                this.currentEnergy += this.depositMultiplier * foodCounter;
-                foodCounter = 0;
-            }
+        //else if (collision.transform.tag == "Hive")
+        //{
+        //    if (foodCounter > 0)
+        //    {
+        //        collision.gameObject.GetComponent<SpawnController>().foodCounter += this.foodCounter;
+        //        this.depositCounter += this.foodCounter;
+        //        this.currentEnergy += this.depositMultiplier * foodCounter;
+        //        foodCounter = 0;
+        //    }
 
-        }
+        //}
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -140,7 +139,7 @@ public class BeeController : MonoBehaviour
 
     private void InputSensors()
     {
-        sensors = sensors.Select(t => t = -1).ToArray();
+        sensors = sensors.Select(t => t = 0).ToArray();
         Vector2 curr = transform.position + (transform.up * (transform.localScale.y*1.05f));
 
         RaycastHit2D hit = Physics2D.Raycast(curr, transform.up, rayDistance,layerMask);
@@ -183,7 +182,7 @@ public class BeeController : MonoBehaviour
             if (hit.transform.tag == "Food")
             {
                 sensors[3] = hit.distance / hitDivider;
-                //Debug.DrawLine(curr, hit.point, Color.yellow);
+                Debug.DrawLine(curr, hit.point, Color.yellow);
             }
             
         }
@@ -195,7 +194,7 @@ public class BeeController : MonoBehaviour
             {
                 
                 sensors[4]= hit.distance / hitDivider;
-                //Debug.DrawLine(curr, hit.point, Color.yellow);
+                Debug.DrawLine(curr, hit.point, Color.yellow);
             }
         }
 
@@ -206,46 +205,57 @@ public class BeeController : MonoBehaviour
             {
                 
                 sensors[5] = hit.distance / hitDivider;
-                //Debug.DrawLine(curr, hit.point, Color.yellow);
+                Debug.DrawLine(curr, hit.point, Color.yellow);
             }
         }
         //3 sensor to know where the Hive is
-        hit = Physics2D.Raycast(curr, transform.up, rayDistance, layerMask);
-        if (hit.collider != null)
-        {
-            if (hit.transform.tag == "Hive")
-            {
-                sensors[6] = hit.distance / hitDivider;
-                //Debug.DrawLine(curr, hit.point, Color.blue);
-            }
+        //hit = Physics2D.Raycast(curr, transform.up, rayDistance, layerMask);
+        //if (hit.collider != null)
+        //{
+        //    if (hit.transform.tag == "Hive")
+        //    {
+        //        sensors[6] = hit.distance / hitDivider;
+        //        //Debug.DrawLine(curr, hit.point, Color.blue);
+        //    }
 
-        }
+        //}
 
-        hit = Physics2D.Raycast(curr, transform.up + transform.right, rayDistance, layerMask);
-        if (hit.collider != null)
-        {
-            if (hit.transform.tag == "Hive")
-            {
+        //hit = Physics2D.Raycast(curr, transform.up + transform.right, rayDistance, layerMask);
+        //if (hit.collider != null)
+        //{
+        //    if (hit.transform.tag == "Hive")
+        //    {
 
-                sensors[7] = hit.distance / hitDivider;
-                //Debug.DrawLine(curr, hit.point, Color.blue);
-            }
-        }
+        //        sensors[7] = hit.distance / hitDivider;
+        //        //Debug.DrawLine(curr, hit.point, Color.blue);
+        //    }
+        //}
 
-        hit = Physics2D.Raycast(curr, transform.up - transform.right, rayDistance, layerMask);
-        if (hit.collider != null)
-        {
-            if (hit.transform.tag == "Hive")
-            {
+        //hit = Physics2D.Raycast(curr, transform.up - transform.right, rayDistance, layerMask);
+        //if (hit.collider != null)
+        //{
+        //    if (hit.transform.tag == "Hive")
+        //    {
 
-                sensors[8] = hit.distance / hitDivider;
-                //Debug.DrawLine(curr, hit.point, Color.blue);
-            }
-        }
+        //        sensors[8] = hit.distance / hitDivider;
+        //        //Debug.DrawLine(curr, hit.point, Color.blue);
+        //    }
+        //}
+        ////Food capacity of the bee.
+        //sensors[9] = foodCounter / foodCapacity;
 
-        sensors[9] = foodCounter / foodCapacity;
+        ////Angle and distance to home
+        //Vector3 toHome = mySpawner.transform.position - transform.position;
+        //float distance = toHome.magnitude;
+        //sensors[10] = distance;
+        //var dotProduct = Vector3.Dot(toHome.normalized, -mySpawner.transform.up.normalized);
 
-
+        //sensors[11] = dotProduct;
+        //if (myBrainIndex==0)
+        //{
+        //    Debug.Log(dotProduct);
+        //    Debug.Log(distance);
+        //}
 
     }
     public void MoveBee(float v, float h)

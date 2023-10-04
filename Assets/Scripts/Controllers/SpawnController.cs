@@ -14,7 +14,7 @@ public class SpawnController : MonoBehaviour
     private Vector3 position;
     private float radius = 2f;
 
-    public int inputNodes = 10;
+    public int inputNodes = 6;
     public int outputNodes = 2;
     public int hiddenNodes = 0;
 
@@ -45,7 +45,6 @@ public class SpawnController : MonoBehaviour
     public List<GameObject> allNeatBee;
 
     public NeatNetwork queensNetwork;
-    public List<NeatNetwork> repNets = new List<NeatNetwork>();
     private int repCtr = 0;
 
     //if the queen "met" with other bees succesfully then we should cross over her net and one net
@@ -53,6 +52,9 @@ public class SpawnController : MonoBehaviour
 
     private bool isRepSuccesful;
     public NeatNetwork printableNet;
+
+    private NeatNetwork numberOneNetwork;
+    private NeatNetwork numberTwoNetwork;
 
     private bool isThisFirstHive = true;
 
@@ -94,25 +96,14 @@ public class SpawnController : MonoBehaviour
 
         if (isThisFirstHive)
         {
-            repNets = new List<NeatNetwork>();
-            isRepSuccesful = false;
             InitialPrintable();
             this.StartingPopulation();
         }
         
     }
-    public void SpawnerInit(List<NeatNetwork> initRepList)
+    public void SpawnerInit()
     {
         isThisFirstHive =false;
-        repNets = initRepList;
-        if (repNets.Count == 0)
-        {
-            isRepSuccesful = false;
-        }
-        else
-        {
-            isRepSuccesful = true;
-        }
         InitialPrintable();
 
         this.StartingPopulation();
@@ -120,13 +111,40 @@ public class SpawnController : MonoBehaviour
     }
 
     //this func is worthless because I forget that I also set the current best when a bee dies.
+    float overallBest = 0;
     private NeatNetwork GetBest()
     {
-        if (allNeatBee.Count>0)
+        if (allNeatBee.Count>2)
         {
             float maxVal = allNeatBee.Max(t => t.gameObject.GetComponent<BeeController>().overallFitness);
-            return allNeatBee.FirstOrDefault(t => t.gameObject.GetComponent<BeeController>().overallFitness == maxVal)
-                .gameObject.GetComponent<BeeController>().myNetwork;
+            List<GameObject> tmpList = allNeatBee.OrderByDescending(t => t.gameObject.GetComponent<BeeController>().overallFitness).ToList();
+
+            if (numberOneNetwork==null)
+            {
+                numberOneNetwork = new NeatNetwork(tmpList[0].gameObject.GetComponent<BeeController>().myNetwork.myGenome)
+                {
+                    fitness = maxVal,
+                };
+                numberTwoNetwork = new NeatNetwork(tmpList[1].gameObject.GetComponent<BeeController>().myNetwork.myGenome);
+            }
+            else if(numberOneNetwork.fitness<maxVal)
+            {
+                numberTwoNetwork = new NeatNetwork(numberOneNetwork.myGenome);
+                numberOneNetwork = new NeatNetwork(tmpList[0].gameObject.GetComponent<BeeController>().myNetwork.myGenome)
+                {
+                    fitness = maxVal,
+                };
+                Debug.Log("Number one is now number two.");
+            }
+            
+           
+            if (overallBest<maxVal)
+            {
+                overallBest = maxVal;
+                NeatUtilities.SaveGenome(numberOneNetwork.myGenome);
+            }
+
+            return numberOneNetwork;
         }
         return queensNetwork;
         
@@ -135,6 +153,7 @@ public class SpawnController : MonoBehaviour
     private void FixedUpdate()
     {
         liveTimer += Time.deltaTime;
+        var tmpBest = GetBest();
         //spawning is off because of test ---WARNING ----
         if (currentBeeCounter < maxSpawnedBeeAtOnce)
         {
@@ -149,12 +168,13 @@ public class SpawnController : MonoBehaviour
         
         if (Id == 0)
         {
-            var tmpBest = GetBest();
+            
             if (drawer.neuralNetwork != tmpBest)
             {
                 drawer.neuralNetwork = tmpBest;
                 drawer.Plot();
             }
+            
         }
 
 
@@ -174,22 +194,8 @@ public class SpawnController : MonoBehaviour
 
     private void InitialPrintable()
     {
-        if (isRepSuccesful)
-        {
-            repCtr %= repNets.Count;
-            printableNet = new NeatNetwork(
-                NeatUtilities.CrossOver(queensNetwork.myGenome, repNets[repCtr].myGenome)
-                );
-            repCtr++;
+        printableNet = queensNetwork;
 
-        }
-        else
-        {
-
-            //I try to mutate the initial network not just the "printable" beacuse
-            //I want to have a biggerv variety
-            printableNet = queensNetwork.MutateInitialNetwork();
-        }
     }
     private void PrintableGeenMutation(float timeNeededToEvolve)
     {
@@ -197,14 +203,10 @@ public class SpawnController : MonoBehaviour
         if (timeNeededToEvolve<=_mutationTimer)
         {
             _mutationTimer -= timeNeededToEvolve;
-            if (isRepSuccesful)
+            if (allNeatBee.Count>2)
             {
-                repCtr %= repNets.Count;
-                printableNet = new NeatNetwork(
-                    NeatUtilities.CrossOver(queensNetwork.myGenome, repNets[repCtr].myGenome)
-                    );
-                repCtr++;
-
+                Debug.Log("Crossover was succesful.");
+                printableNet = new NeatNetwork(NeatUtilities.CrossOver(numberOneNetwork.myGenome, numberTwoNetwork.myGenome));
             }
             else
             {

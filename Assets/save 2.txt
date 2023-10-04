@@ -1,0 +1,96 @@
+{
+    "nodeGenes": [
+        {
+            "id": 0,
+            "x": 0.10000000149011612,
+            "y": 0.1428571492433548,
+            "type": 0
+        },
+        {
+            "id": 1,
+            "x": 0.10000000149011612,
+            "y": 0.2857142984867096,
+            "type": 0
+        },
+        {
+            "id": 2,
+            "x": 0.10000000149011612,
+            "y": 0.4285714626312256,
+            "type": 0
+        },
+        {
+            "id": 3,
+            "x": 0.10000000149011612,
+            "y": 0.5714285969734192,
+            "type": 0
+        },
+        {
+            "id": 4,
+            "x": 0.10000000149011612,
+            "y": 0.7142857313156128,
+            "type": 0
+        },
+        {
+            "id": 5,
+            "x": 0.10000000149011612,
+            "y": 0.8571429252624512,
+            "type": 0
+        },
+        {
+            "id": 6,
+            "x": 0.8999999761581421,
+            "y": 0.3333333432674408,
+            "type": 1
+        },
+        {
+            "id": 7,
+            "x": 0.8999999761581421,
+            "y": 0.6666666865348816,
+            "type": 1
+        }
+    ],
+    "conGenes": [
+        {
+            "inputNode": 0,
+            "outputNode": 6,
+            "weight": -1,
+            "isActive": true,
+            "innovNum": 0
+        },
+        {
+            "inputNode": 1,
+            "outputNode": 7,
+            "weight": -2,
+            "isActive": true,
+            "innovNum": 1
+        },
+        {
+            "inputNode": 2,
+            "outputNode": 7,
+            "weight": 2,
+            "isActive": true,
+            "innovNum": 2
+        },
+        {
+            "inputNode": 3,
+            "outputNode": 6,
+            "weight": 2,
+            "isActive": true,
+            "innovNum": 3
+        },
+        {
+            "inputNode": 4,
+            "outputNode": 7,
+            "weight": 2,
+            "isActive": true,
+            "innovNum": 4
+        },
+        {
+            "inputNode": 5,
+            "outputNode": 7,
+            "weight": -2,
+            "isActive": true,
+            "innovNum": 5
+        }
+    ]
+}

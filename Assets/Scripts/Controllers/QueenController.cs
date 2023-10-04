@@ -190,7 +190,7 @@ public class QueenController : MonoBehaviour
         //    }
         //}
 
-        sensors[9] = 0;
+        //sensors[9] = 0;
 
 
 
@@ -213,7 +213,7 @@ public class QueenController : MonoBehaviour
         spawnerController.inputNodes = mySpawner.inputNodes;
         spawnerController.outputNodes = mySpawner.outputNodes;
         spawnerController.queensNetwork = myNetwork;
-        spawnerController.SpawnerInit(this.repNets);
+        spawnerController.SpawnerInit();
         spawnerController.maxSpawnedBeeAtOnce = UnityEngine.Random.RandomRange(6, 8);
 
 

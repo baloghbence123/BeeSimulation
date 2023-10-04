@@ -1162,8 +1162,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
+      propertyPath: inputNodes
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
+      propertyPath: mutationTimer
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
       propertyPath: queenSpawnChance
-      value: 0.01
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
+      propertyPath: maxTimeTilBeeDeath
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
       propertyPath: startingPopulation
@@ -1171,7 +1183,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
       propertyPath: maxSpawnedBeeAtOnce
-      value: 10
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 5615846651387077331, guid: e26fe9172817f1e4fbd29642a5f67ea1, type: 3}
       propertyPath: loadNeuralsFromSaved
