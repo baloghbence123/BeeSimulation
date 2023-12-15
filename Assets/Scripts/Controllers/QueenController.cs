@@ -212,8 +212,6 @@ public class QueenController : MonoBehaviour
         var spawnerController = spawnerObject.GetComponent<SpawnController>();
         spawnerController.inputNodes = mySpawner.inputNodes;
         spawnerController.outputNodes = mySpawner.outputNodes;
-        spawnerController.queensNetwork = myNetwork;
-        spawnerController.SpawnerInit();
         spawnerController.maxSpawnedBeeAtOnce = UnityEngine.Random.RandomRange(6, 8);
 
 

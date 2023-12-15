@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3038846759194452689}
   - component: {fileID: 4341658489455067822}
   - component: {fileID: -3777422004855296448}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bee
   m_TagString: Bee
   m_Icon: {fileID: 0}
@@ -100,15 +100,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mySpawner: {fileID: 0}
-  startingEnergy: 20
-  currentEnergy: 0
-  maxTimeTilDeath: 1000
-  timeLived: 0
+  paralised: 0
+  maxTimeTilDeath: 25
   overallFitness: 0
   foodMultiplier: 2
   depositMultiplier: 4
   foodCounter: 0
   depositCounter: 0
+  plusTimePerFood: 3
   foodCapacity: 10
   myBrainIndex: 0
   inputNodes: 0

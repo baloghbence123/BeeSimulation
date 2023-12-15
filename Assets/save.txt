@@ -1,1 +1,96 @@
-{"nodeGenes":[{"id":0,"x":0.10000000149011612,"y":0.1428571492433548,"type":0},{"id":1,"x":0.10000000149011612,"y":0.2857142984867096,"type":0},{"id":2,"x":0.10000000149011612,"y":0.4285714626312256,"type":0},{"id":3,"x":0.10000000149011612,"y":0.5714285969734192,"type":0},{"id":4,"x":0.10000000149011612,"y":0.7142857313156128,"type":0},{"id":5,"x":0.10000000149011612,"y":0.8571429252624512,"type":0},{"id":6,"x":0.8999999761581421,"y":0.3333333432674408,"type":1},{"id":7,"x":0.8999999761581421,"y":0.6666666865348816,"type":1},{"id":8,"x":0.5,"y":0.4761905074119568,"type":2},{"id":9,"x":0.30000001192092898,"y":0.3809524178504944,"type":2}],"conGenes":[{"inputNode":0,"outputNode":6,"weight":-1.2946157455444337,"isActive":true,"innovNum":0},{"inputNode":1,"outputNode":7,"weight":-1.7062206268310547,"isActive":false,"innovNum":1},{"inputNode":1,"outputNode":6,"weight":0.6540381908416748,"isActive":false,"innovNum":1},{"inputNode":2,"outputNode":7,"weight":1.5812625885009766,"isActive":true,"innovNum":2},{"inputNode":5,"outputNode":7,"weight":-0.4100521504878998,"isActive":true,"innovNum":5},{"inputNode":1,"outputNode":8,"weight":0.8401750326156616,"isActive":false,"innovNum":1},{"inputNode":8,"outputNode":7,"weight":-1.627542495727539,"isActive":true,"innovNum":4},{"inputNode":9,"outputNode":8,"weight":0.8496009111404419,"isActive":true,"innovNum":6},{"inputNode":2,"outputNode":6,"weight":-0.9374902844429016,"isActive":true,"innovNum":7}]}
+{
+    "nodeGenes": [
+        {
+            "id": 0,
+            "x": 0.10000000149011612,
+            "y": 0.1428571492433548,
+            "type": 0
+        },
+        {
+            "id": 1,
+            "x": 0.10000000149011612,
+            "y": 0.2857142984867096,
+            "type": 0
+        },
+        {
+            "id": 2,
+            "x": 0.10000000149011612,
+            "y": 0.4285714626312256,
+            "type": 0
+        },
+        {
+            "id": 3,
+            "x": 0.10000000149011612,
+            "y": 0.5714285969734192,
+            "type": 0
+        },
+        {
+            "id": 4,
+            "x": 0.10000000149011612,
+            "y": 0.7142857313156128,
+            "type": 0
+        },
+        {
+            "id": 5,
+            "x": 0.10000000149011612,
+            "y": 0.8571429252624512,
+            "type": 0
+        },
+        {
+            "id": 6,
+            "x": 0.8999999761581421,
+            "y": 0.3333333432674408,
+            "type": 1
+        },
+        {
+            "id": 7,
+            "x": 0.8999999761581421,
+            "y": 0.6666666865348816,
+            "type": 1
+        }
+    ],
+    "conGenes": [
+        {
+            "inputNode": 0,
+            "outputNode": 6,
+            "weight": -1,
+            "isActive": true,
+            "innovNum": 0
+        },
+        {
+            "inputNode": 1,
+            "outputNode": 7,
+            "weight": -2,
+            "isActive": true,
+            "innovNum": 1
+        },
+        {
+            "inputNode": 2,
+            "outputNode": 7,
+            "weight": 2,
+            "isActive": true,
+            "innovNum": 2
+        },
+        {
+            "inputNode": 3,
+            "outputNode": 6,
+            "weight": 2,
+            "isActive": true,
+            "innovNum": 3
+        },
+        {
+            "inputNode": 4,
+            "outputNode": 7,
+            "weight": 2,
+            "isActive": true,
+            "innovNum": 4
+        },
+        {
+            "inputNode": 5,
+            "outputNode": 7,
+            "weight": -2,
+            "isActive": true,
+            "innovNum": 5
+        }
+    ]
+}

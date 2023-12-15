@@ -7,6 +7,9 @@ using System.Linq;
 
 public class NeatUtilities : MonoBehaviour
 {
+    private static int InputNodes = 6;
+    private static int OutputNodes = 2;
+    private static int HiddenNodes = 2;
     public static System.Random random= new System.Random();
     public static float[] GetDisjointAndExcessTogether(List<ConGene> firstCons, List<ConGene> secondCons)
     {
@@ -135,16 +138,50 @@ public class NeatUtilities : MonoBehaviour
         //the connections are ready. Now we need the nodes too. Which we can get easily from the congenes.
         retVal.nodeGenes.AddRange(genomeOne.nodeGenes.Where(t=>t.type == NodeGene.TYPE.Input));
         retVal.nodeGenes.AddRange(genomeOne.nodeGenes.Where(t => t.type == NodeGene.TYPE.Output));
-        foreach (ConGene con in genomeOne.conGenes)
+        foreach (ConGene con in retVal.conGenes)
         {
             if (!retVal.nodeGenes.Any(t=>t.id == con.inputNode))
             {
+                
                 retVal.nodeGenes.Add(new NodeGene(con.inputNode, NodeGene.TYPE.Hidden));
             }
             if (!retVal.nodeGenes.Any(t => t.id == con.outputNode))
             {
                 retVal.nodeGenes.Add(new NodeGene(con.outputNode, NodeGene.TYPE.Hidden));
             }
+        }
+        foreach (NodeGene node in retVal.nodeGenes)
+        {
+            if (node.type == NodeGene.TYPE.Hidden && node.y==0 && node.x==0)
+            {
+                var tmp = genomeOne.nodeGenes.FirstOrDefault(t => t.id == node.id);
+                if (tmp != null)
+                {
+                    node.y = tmp.y;
+                    node.x = tmp.x;
+                }
+                else
+                {
+                    tmp = genomeTwo.nodeGenes.FirstOrDefault(t => t.id == node.id);
+                    if (tmp!=null)
+                    {
+                        node.y = tmp.y;
+                        node.x = tmp.x;
+                    }
+                    
+                }
+            }
+        }
+        for (int i = 0; i < retVal.conGenes.Count; i++)
+        {
+            var con = retVal.conGenes[i];
+            var firstnode = retVal.nodeGenes.FirstOrDefault(t => t.id == con.inputNode);
+            var secondnode = retVal.nodeGenes.FirstOrDefault(t => t.id == con.outputNode);
+            if (firstnode.x >= secondnode.x)
+            {
+                retVal.conGenes.Remove(con);
+            }
+
         }
 
         return retVal;

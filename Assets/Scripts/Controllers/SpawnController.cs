@@ -26,12 +26,11 @@ public class SpawnController : MonoBehaviour
     public float foodCounter = 0;
 
     [Header("Spawn and evolve options:")]
-    public float mutationTimer = 5;
     public float spawnTimer = 0.5f;
-    public int maxSpawnedBeeAtOnce = 25;
-    public float maxTimeTilBeeDeath = 100;
+    public int maxSpawnedBeeAtOnce = 40;
+    public float maxTimeTilBeeDeath = 200;
 
-    public float queenSpawnChance = 0.02f;
+    public float queenSpawnChance = 0.00f;
 
     public float hiveMaxTime = 1000;
 
@@ -42,9 +41,12 @@ public class SpawnController : MonoBehaviour
     public GameObject BeePrefab;
     public GameObject QueenPrefab;
 
-    public List<GameObject> allNeatBee;
+    public List<GameObject> liveNeat;
+    public List<GameObject> deadNeat;
+    public List<NeatNetwork> spawnableNetworks;
 
-    public NeatNetwork queensNetwork;
+
+
     private int repCtr = 0;
 
     //if the queen "met" with other bees succesfully then we should cross over her net and one net
@@ -59,8 +61,10 @@ public class SpawnController : MonoBehaviour
     private bool isThisFirstHive = true;
 
     [Header("Private variables(do not change them):")]
-    private float _mutationTimer = 0;
+
     private float _spawnTimer = 0;
+    private float offspringTimer = 0;
+    public readonly float offspringTime = 150;
 
     public float _maxFitness = 0;
     public NeatNetwork _bestNeat;
@@ -73,51 +77,44 @@ public class SpawnController : MonoBehaviour
     private void Start()
     {
         Id = _id++;
-        allNeatBee  = new List<GameObject>();
-
-        drawer = GameObject.FindObjectOfType<DrawNeuralNetwork>(); //this ensures everyone has the
-        //same drawer object.
+        liveNeat  = new List<GameObject>();
+        deadNeat = new List<GameObject>();
+        spawnableNetworks = new List<NeatNetwork>();
         
+        drawer = GameObject.FindObjectOfType<DrawNeuralNetwork>(); //this ensures everyone has the
+                                                                   //same drawer object.
+
         //queensNetwork = new NeatNetwork(inputNodes, outputNodes, hiddenNodes);
-        if (queensNetwork == null)
+        if (loadNeuralsFromSaved)
         {
-            if (loadNeuralsFromSaved)
+            var tmpLoadedNetwork = NeatUtilities.LoadGenome();
+            for (int i = 0; i < maxSpawnedBeeAtOnce; i++)
             {
-                queensNetwork = new NeatNetwork(NeatUtilities.LoadGenome());
+                spawnableNetworks.Add(new NeatNetwork(tmpLoadedNetwork));
             }
-            else
-            {
-                queensNetwork = new NeatNetwork(inputNodes, outputNodes, hiddenNodes);
-            }
+        }
+        else
+        {
+            spawnableNetworks.AddRange(Enumerable.Range(0, maxSpawnedBeeAtOnce).Select(t => new NeatNetwork(inputNodes, outputNodes, hiddenNodes).MutateInitialNetwork()));
+            
         }
 
 
         position = transform.position;
 
-        if (isThisFirstHive)
-        {
-            InitialPrintable();
-            this.StartingPopulation();
-        }
         
-    }
-    public void SpawnerInit()
-    {
-        isThisFirstHive =false;
-        InitialPrintable();
-
-        this.StartingPopulation();
-
     }
 
     //this func is worthless because I forget that I also set the current best when a bee dies.
     float overallBest = 0;
     private NeatNetwork GetBest()
     {
-        if (allNeatBee.Count>2)
+        var tmpAllNeat = liveNeat.ToList();
+        tmpAllNeat.AddRange(deadNeat);
+        if (tmpAllNeat.Count>2)
         {
-            float maxVal = allNeatBee.Max(t => t.gameObject.GetComponent<BeeController>().overallFitness);
-            List<GameObject> tmpList = allNeatBee.OrderByDescending(t => t.gameObject.GetComponent<BeeController>().overallFitness).ToList();
+            float maxVal = tmpAllNeat.Max(t => t.gameObject.GetComponent<BeeController>().overallFitness);
+            List<GameObject> tmpList = tmpAllNeat.OrderByDescending(t => t.gameObject.GetComponent<BeeController>().overallFitness).ToList();
 
             if (numberOneNetwork==null)
             {
@@ -146,29 +143,53 @@ public class SpawnController : MonoBehaviour
 
             return numberOneNetwork;
         }
-        return queensNetwork;
+        return null;
         
     }
+    private NeatNetwork GetBestByFitness()
+    {
+        var tmpAllNeat = liveNeat.ToList();
+        tmpAllNeat.AddRange(deadNeat.ToList());
+        var currentBest = tmpAllNeat.OrderByDescending(t => t.gameObject.GetComponent<BeeController>().overallFitness).FirstOrDefault();
+        if (currentBest != null)
+        {
 
+            return currentBest.gameObject.GetComponent<BeeController>().myNetwork;
+        }
+        else
+        {
+            return spawnableNetworks.FirstOrDefault();
+        }
+        
+    }
     private void FixedUpdate()
     {
         liveTimer += Time.deltaTime;
-        var tmpBest = GetBest();
-        //spawning is off because of test ---WARNING ----
+        offspringTimer += Time.deltaTime;
+        //var tmpBest = GetBest();
+        if (spawnableNetworks.Count==0)
+        {
+            //make offsprings
+            var tmpAllNetworks = new List<BeeController>();
+            tmpAllNetworks.AddRange(liveNeat.Select(t=>t.gameObject.GetComponent<BeeController>()).ToList());
+            tmpAllNetworks.AddRange(deadNeat.Select(t => t.gameObject.GetComponent<BeeController>()).ToList());
+            spawnableNetworks.AddRange(SpawnUtilities.OffspringCreation(tmpAllNetworks).ToList());
+            deadNeat.ForEach(t => Destroy(t.gameObject));
+            deadNeat = new List<GameObject>();
+        }
         if (currentBeeCounter < maxSpawnedBeeAtOnce)
         {
             SetTimers();
-            PrintableGeenMutation(mutationTimer);
             SingleBeeSpawnOnTime(spawnTimer);
         }
-
+        
         //best is off because too much processing power needed -->> ##Devnote:
         //Also it should get the best of all population. Or atleast it should show the best per hive.
 
         
         if (Id == 0)
         {
-            
+            var tmpBest = GetBestByFitness();
             if (drawer.neuralNetwork != tmpBest)
             {
                 drawer.neuralNetwork = tmpBest;
@@ -183,54 +204,21 @@ public class SpawnController : MonoBehaviour
     }
     private int GetCurrentCount()
     {
-        return allNeatBee.Count;
+        return liveNeat.Count;
     }
     private void SetTimers()
     {
 
-        _mutationTimer += Time.deltaTime;
         _spawnTimer += Time.deltaTime;
-    }
-
-    private void InitialPrintable()
-    {
-        printableNet = queensNetwork;
-
-    }
-    private void PrintableGeenMutation(float timeNeededToEvolve)
-    {
-        
-        if (timeNeededToEvolve<=_mutationTimer)
-        {
-            _mutationTimer -= timeNeededToEvolve;
-            if (allNeatBee.Count>2)
-            {
-                Debug.Log("Crossover was succesful.");
-                printableNet = new NeatNetwork(NeatUtilities.CrossOver(numberOneNetwork.myGenome, numberTwoNetwork.myGenome));
-            }
-            else
-            {
-                
-                //I try to mutate the initial network not just the "printable" beacuse
-                //I want to have a biggerv variety
-                printableNet = queensNetwork.MutateInitialNetwork();
-            }
-            
-        }
     }
     private void SingleBeeSpawnOnTime(float timeNeededToSpawnOne)
     {
         if (timeNeededToSpawnOne<=_spawnTimer)
         {
             _spawnTimer -= timeNeededToSpawnOne;
-            SpawnABee(this.printableNet);
-        }
-    }
-    private void StartingPopulation()
-    {
-        for (int i = 0; i < startingPopulation; i++)
-        {
-            this.SpawnABee(this.printableNet);
+            
+            SpawnABee(spawnableNetworks.First());            
+            spawnableNetworks.RemoveAt(0);
         }
     }
     //basically it is a function to spawn a bee next to the hive
@@ -251,7 +239,7 @@ public class SpawnController : MonoBehaviour
             var spawnTmp = Instantiate(QueenPrefab, pos, this.transform.rotation);
             var controllerTmp = spawnTmp.gameObject.GetComponent<QueenController>();
             controllerTmp.transform.up = dir.normalized;
-            controllerTmp.myBrainIndex = allNeatBee.Count;
+            controllerTmp.myBrainIndex = liveNeat.Count;
 
 
             //I try to mutate the network to make it more realistic. I suppose the mutation is similar IRL
@@ -282,7 +270,7 @@ public class SpawnController : MonoBehaviour
         
             var controllerTmp = spawnTmp.gameObject.GetComponent<BeeController>();
             controllerTmp.transform.up = dir.normalized ;
-            controllerTmp.myBrainIndex = allNeatBee.Count;
+            controllerTmp.myBrainIndex = liveNeat.Count;
 
             //I try to mutate the network to make it more realistic. I suppose the mutation is
             //similar IRL. I mean there is a slight dns mutation between the parent's and child's
@@ -296,7 +284,7 @@ public class SpawnController : MonoBehaviour
             controllerTmp.mySpawner = this;
             controllerTmp.maxTimeTilDeath = maxTimeTilBeeDeath;
 
-            allNeatBee.Add(spawnTmp);
+            liveNeat.Add(spawnTmp);
             currentBeeCounter++;
         }
 
@@ -313,7 +301,7 @@ public class SpawnController : MonoBehaviour
     }
     private void Death()
     {
-        foreach (var item in allNeatBee)
+        foreach (var item in liveNeat)
         {
             Destroy(item);
         }

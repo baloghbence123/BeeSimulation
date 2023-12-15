@@ -10,18 +10,18 @@ public class NeatGenome
     public List<ConGene> conGenes;
     public static List<ConGene> innovConGene = new List<ConGene>();
     //Creating chances
-    float createEdgeChance = 6f;
-    float createNodeChance = 2f;
+    float createEdgeChance = 8f;
+    float createNodeChance = 3f;
 
-    float deleteEdgeChance = 1f;
+    float deleteEdgeChance = 0f;
     
 
     //Weight mutation chances
-    float randomWeightChance = 1f;
+    float randomWeightChance = 4f;
     float perturbWeightChance = 90f;
 
     //Weight mutation mutation multiplayer range => if multiplier is 1 then the range between -0.5 and 0.5 
-    float perturbWeightMultiplier = 0.1f;
+    float perturbWeightMultiplier = 0.2f;
 
     public NeatGenome()
     {
@@ -43,11 +43,7 @@ public class NeatGenome
         float deleteConChance = UnityEngine.Random.Range(0f, 100f);
 
 
-        if (deleteConChance <= deleteEdgeChance)
-        {
-            // Delete a random connection
-            DeleteRandomConnection();
-        }
+        
 
         if (chanceNode <= createNodeChance)
         {

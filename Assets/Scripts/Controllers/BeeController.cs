@@ -12,17 +12,14 @@ public class BeeController : MonoBehaviour
 
     private float[] sensors;
 
-    private float hitDivider = 7f;
-    private float rayDistance = 7f;
-
-
+    private float hitDivider = 6f;
+    private float rayDistance = 6f;
     
+   public bool paralised = false;
+
 
     [Header("Energy Options")]
-    public float startingEnergy = 20;
-    public float currentEnergy = 0;
-    public float maxTimeTilDeath = 250;
-    public float timeLived = 0;
+    public float maxTimeTilDeath = 24;
 
     [Header("FitnessOptions")]
     public float overallFitness = 0;
@@ -31,6 +28,7 @@ public class BeeController : MonoBehaviour
     public float foodCounter = 0;
     public float depositCounter = 0;
 
+    public float plusTimePerFood = 8;
     public float foodCapacity = 10;
 
     [Header("Network Settings")]
@@ -48,46 +46,38 @@ public class BeeController : MonoBehaviour
     void Start()
     {
         layerMask = LayerMask.GetMask("ObjectsToSee");
-        currentEnergy = startingEnergy;
         sensors = new float[inputNodes];
         
+
+
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        InputSensors();
-        float[] outputs = myNetwork.FeedForwardNetwork(sensors);
-        MoveBee(outputs[0], outputs[1]);
-        CalculateFitness();
+        if (!paralised)
+        {
+            InputSensors();
+            float[] outputs = myNetwork.FeedForwardNetwork(sensors);
+            MoveBee(outputs[0], outputs[1]);
+            surviveTime += Time.deltaTime;
+            CalculateFitness();
+        }
 
-        surviveTime += Time.deltaTime;
+        
+        
+
     }
 
     private void CalculateFitness()
     {
-        UpdateEnergy();
-        overallFitness = (foodCounter * foodMultiplier) + (depositCounter * depositMultiplier);
-        timeLived+= Time.deltaTime;
-        if (currentEnergy <= 0 || timeLived>maxTimeTilDeath)
+        
+        overallFitness = (foodCounter * foodMultiplier) + (depositCounter * depositMultiplier) + 1;
+        if (surviveTime > maxTimeTilDeath)
         {
             Death();
         }
 
-    }
-    private void UpdateEnergy()
-    {
-        currentEnergy -= Time.deltaTime;
-    }
-    private void SetBestFitness()
-    {
-        if (mySpawner._maxFitness < this.overallFitness)
-        {
-            mySpawner._maxFitness = this.overallFitness;
-            mySpawner.queensNetwork = this.myNetwork;
-            NeatUtilities.SaveGenome(this.myNetwork.myGenome);
-
-        }
     }
     private void Death()
     {
@@ -95,20 +85,36 @@ public class BeeController : MonoBehaviour
         //SetBestFitness();
 
         mySpawner.currentBeeCounter--;
-        mySpawner.allNeatBee.Remove(this.gameObject);
-        Destroy(gameObject);
+        mySpawner.liveNeat.Remove(this.gameObject);
+
+        var tmp = new GameObject();
+        tmp.AddComponent<BeeController>();
+        var tmpcontroller = tmp.gameObject.GetComponent<BeeController>();
+        tmpcontroller.myBrainIndex = this.myBrainIndex;
+        tmpcontroller.myNetwork = this.myNetwork;
+        tmpcontroller.mySpawner = this.mySpawner;
+        tmpcontroller.overallFitness = overallFitness;
+        tmpcontroller.foodCounter = this.foodCounter;
+        tmpcontroller.depositCounter = this.depositCounter;
+        tmpcontroller.paralised = true;
+        mySpawner.deadNeat.Add(tmp);
+
+
+        Destroy(this.gameObject);
+        
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+       
         if (collision.transform.tag == "Food")
         {
-
+                
                 collision.gameObject.GetComponent<FoodController>().SpawnSignleFood();
                 Destroy(collision.gameObject);
                 foodCounter++;
-                currentEnergy += foodMultiplier;
-                mySpawner.foodCounter += this.foodCounter;
+                mySpawner.foodCounter++;
+                maxTimeTilDeath += plusTimePerFood;
                 //Debug.Log("Bee Ate Food");
         }
         //else if (collision.transform.tag == "Hive")
@@ -143,12 +149,16 @@ public class BeeController : MonoBehaviour
         Vector2 curr = transform.position + (transform.up * (transform.localScale.y*1.05f));
 
         RaycastHit2D hit = Physics2D.Raycast(curr, transform.up, rayDistance,layerMask);
+        for (int i = 0; i < sensors.Length; i++)
+        {
+            sensors[i] = 0;
+        }
         //3 sensor to see wall
         if (hit.collider!=null)
         {
             if (hit.transform.tag =="Wall")
             {
-                sensors[0] = hit.distance / hitDivider;
+                sensors[0] = 1-(hit.distance / hitDivider);
                 Debug.DrawLine(curr, hit.point, Color.white);
             }
         }
@@ -160,7 +170,7 @@ public class BeeController : MonoBehaviour
             if (hit.transform.tag == "Wall")
             {
 
-                sensors[1] = hit.distance / hitDivider;
+                sensors[1] = 1 - (hit.distance / hitDivider);
                 Debug.DrawLine(curr, hit.point, Color.white);
             }
         }
@@ -171,7 +181,7 @@ public class BeeController : MonoBehaviour
             if (hit.transform.tag == "Wall")
             {
 
-                sensors[2] = hit.distance / hitDivider;
+                sensors[2] = 1 - (hit.distance / hitDivider);
                 Debug.DrawLine(curr, hit.point, Color.white);
             }
         }
@@ -181,7 +191,7 @@ public class BeeController : MonoBehaviour
         {
             if (hit.transform.tag == "Food")
             {
-                sensors[3] = hit.distance / hitDivider;
+                sensors[3] = 1 - (hit.distance / hitDivider);
                 Debug.DrawLine(curr, hit.point, Color.yellow);
             }
             
@@ -193,7 +203,7 @@ public class BeeController : MonoBehaviour
             if (hit.transform.tag == "Food")
             {
                 
-                sensors[4]= hit.distance / hitDivider;
+                sensors[4]= 1 - (hit.distance / hitDivider);
                 Debug.DrawLine(curr, hit.point, Color.yellow);
             }
         }
@@ -204,7 +214,7 @@ public class BeeController : MonoBehaviour
             if (hit.transform.tag == "Food")
             {
                 
-                sensors[5] = hit.distance / hitDivider;
+                sensors[5] = 1 - (hit.distance / hitDivider);
                 Debug.DrawLine(curr, hit.point, Color.yellow);
             }
         }
@@ -260,6 +270,10 @@ public class BeeController : MonoBehaviour
     }
     public void MoveBee(float v, float h)
     {
+        if (v==0)
+        {
+            v = 0.4f;
+        }
         // Getting Next Position
         Vector3 input = Vector3.Lerp(Vector3.zero, new Vector3(0, v * 2f, 0), 0.1f);
         input = transform.TransformDirection(input);

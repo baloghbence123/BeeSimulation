@@ -62,7 +62,8 @@ public class NeatNetwork
 
         for (int i = 0; i < hid; i++)
         {
-            NodeGene newNodeGene = new NodeGene(nodeId, NodeGene.TYPE.Hidden,0.5f, yPointHid * (i + 1));
+            
+            NodeGene newNodeGene= new NodeGene(nodeId, NodeGene.TYPE.Hidden, 0.5f, yPointHid * (i + 1));
             newNodeGenes.Add(newNodeGene);
             nodeId += 1;
         }
@@ -151,7 +152,7 @@ public class NeatNetwork
     public float[] FeedForwardNetwork(float[] inputs)
     {
         float[] outputs = new float[outputNodes.Count];
-
+        
         for (int i = 0; i < inputNodes.Count; i++)
         {
             inputNodes[i].SetInputNodeValue(inputs[i]);
@@ -198,7 +199,7 @@ public class Node
     #region NeededToFeedForward
     public void SetInputNodeValue(float val)
     {
-        val = Sigmoid(val);
+        //val = Sigmoid(val);
         this.value = val;
     }
     public void SetHiddenNodeValue()
@@ -208,7 +209,7 @@ public class Node
         {
             val += (con.weight * con.inputNodeValue);
         }
-        this.value = TanH(val);
+        this.value = TanHMod1(val);
     }
     public void SetOutputNodeValue()
     {
@@ -217,7 +218,7 @@ public class Node
         {
             val += (con.weight * con.inputNodeValue);
         }
-        this.value = TanH(val);
+        this.value = TanHMod1(val);
     }
 
     public void FeedForwardValue()
